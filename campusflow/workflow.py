@@ -13,6 +13,8 @@ def assign_ticket(tickets, ticket_id, staff):
 
 def change_status(tickets, ticket_id, new_status):
     ticket = get_ticket(tickets, ticket_id)
+    if not isinstance(new_status, str) or not new_status.strip():
+        raise ValueError('Status must be open, in_progress or resolved')
     new_status = new_status.strip().lower()
     current = ticket['status']
     valid = ((current == 'open' and new_status == 'in_progress' and ticket['assigned_to'])

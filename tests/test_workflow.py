@@ -39,3 +39,54 @@ class WorkflowTests(unittest.TestCase):
     def test_empty_report(self): self.assertEqual(report([])['total'], 0)
     def test_unknown_id(self):
         with self.assertRaises(ValueError): assign_ticket([], 'T999', 'Ada')
+
+
+class WorkflowEdgeTests(unittest.TestCase):
+    def test_blank_staff_preserves_assignment(self):
+        tickets = []
+        ticket = new(tickets)
+        assign_ticket(tickets, ticket['id'], 'Ada')
+        for staff in ('', '  ', None):
+            with self.subTest(staff=staff):
+                before = ticket.copy()
+                with self.assertRaises(ValueError):
+                    assign_ticket(tickets, ticket['id'], staff)
+                self.assertEqual(ticket, before)
+
+    def test_invalid_status_preserves_ticket(self):
+        tickets = []
+        ticket = new(tickets)
+        for status in ('resolved', 'open', 'unknown', '', None, 42):
+            with self.subTest(status=status):
+                before = ticket.copy()
+                with self.assertRaises(ValueError):
+                    change_status(tickets, ticket['id'], status)
+                self.assertEqual(ticket, before)
+
+    def test_queue_excludes_started_and_resolved(self):
+        tickets = []
+        waiting = new(tickets)
+        started = new(tickets, 'high', 12)
+        resolved = new(tickets, 'high', 12)
+        for ticket in (started, resolved):
+            assign_ticket(tickets, ticket['id'], 'Ada')
+            change_status(tickets, ticket['id'], 'in_progress')
+        change_status(tickets, resolved['id'], 'resolved')
+        self.assertEqual(work_queue(tickets), [waiting])
+        change_status(tickets, resolved['id'], 'open')
+        self.assertEqual(work_queue(tickets), [resolved, waiting])
+
+    def test_report_counts_mixed_tickets(self):
+        tickets = []
+        new(tickets)
+        high = new(tickets, 'high', 1)
+        critical = new(tickets, 'high', 10)
+        for ticket in (high, critical):
+            assign_ticket(tickets, ticket['id'], 'Ada')
+            change_status(tickets, ticket['id'], 'in_progress')
+        change_status(tickets, critical['id'], 'resolved')
+        self.assertEqual(report(tickets), {
+            'total': 3,
+            'status': {'open': 1, 'in_progress': 1, 'resolved': 1},
+            'priority': {'critical': 1, 'high': 1, 'medium': 0, 'low': 1},
+        })
