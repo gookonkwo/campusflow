@@ -12,13 +12,13 @@ Python 3.9+; no external packages needed.
 
 ## Run
 ```bash
-python main.py
+python3 main.py
 ```
 Choose menu items 1–8. Tickets are saved in `data/tickets.json` automatically after changes. To start fresh, remove that file when the program is closed.
 
 ## Test
 ```bash
-python -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v
 ```
 
 ## Rules
@@ -29,8 +29,17 @@ python -m unittest discover -s tests -v
 
 ## Known limitations
 - Local single-user CLI only; no concurrency, authentication or graphical interface.
-- Saved JSON is checked for required fields and unique IDs but not all schema value types.
+- Saved JSON is validated before loading and saving; writes use atomic replacement. Run only one instance against a data file.
 
 ## GitHub review evidence
 Engineer A PR: [add link after genuine review]
 Engineer B PR: [add link after genuine review]
+
+## Completion branch
+The `feat/complete-cli` branch integrates the existing ticket and workflow modules, adds the eight-option CLI and validated JSON persistence, and includes 23 automated tests. Both engineers still need to perform genuine peer reviews and fill in their names and review links above.
+
+To use another data file:
+```bash
+python3 main.py --data data/demo.json
+```
+Changes are saved immediately. Invalid input and failed saves leave the current ticket collection unchanged.
