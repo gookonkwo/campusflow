@@ -18,5 +18,5 @@ def report(tickets):
         "category": category,
         "unresolved": status["open"] + status["in_progress"],
         "resolved": resolved,
-        "resolution_percentage": resolved / total * 100 if total else 0.0,
+        "resolution_percentage": round(resolved / total * 100, 2) if total else 0.0,
     }
