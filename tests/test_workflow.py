@@ -89,4 +89,8 @@ class WorkflowEdgeTests(unittest.TestCase):
             'total': 3,
             'status': {'open': 1, 'in_progress': 1, 'resolved': 1},
             'priority': {'critical': 1, 'high': 1, 'medium': 0, 'low': 1},
+            'category': {'Network': 3, 'Hardware': 0, 'Software': 0, 'Other': 0},
+            'unresolved': 2,
+            'resolved': 1,
+            'resolution_percentage': 100 / 3,
         })
