@@ -1,5 +1,7 @@
 """Read-only ticket search with combined optional filters."""
 
+from copy import deepcopy
+
 CATEGORIES = ("Network", "Hardware", "Software", "Other")
 STATUSES = ("open", "in_progress", "resolved")
 PRIORITIES = ("critical", "high", "medium", "low")
@@ -28,7 +30,7 @@ def search_tickets(tickets, title="", category="", status="", priority=""):
         raise ValueError("Invalid priority filter")
 
     return [
-        ticket for ticket in tickets
+        deepcopy(ticket) for ticket in tickets
         if (not title or title in ticket["title"].casefold())
         and (not category or category == ticket["category"].casefold())
         and (not status or status == ticket["status"])
