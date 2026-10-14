@@ -7,6 +7,8 @@ import sys
 from campusflow.tickets import create_ticket, get_ticket
 from campusflow.workflow import assign_ticket, change_status, work_queue
 from campusflow.reports import report
+from campusflow.search import search_tickets, CATEGORIES, STATUSES, PRIORITIES
+from campusflow.understanding_check import run_understanding_check
 from campusflow.storage import load_tickets, save_tickets
 
 MENU = '''
@@ -18,7 +20,11 @@ CampusFlow
 5. Change status / reopen
 6. Work queue
 7. Reports
-8. Exit'''
+8. Exit
+9. Search tickets
+10. Engineering Understanding Check
+11. Add follow-up note
+12. View ticket notes'''
 
 
 def show(tickets):
@@ -27,6 +33,58 @@ def show(tickets):
     for ticket in tickets:
         print(f"{ticket['id']} | {ticket['title']} | {ticket['priority']} | "
               f"{ticket['status']} | {ticket['assigned_to'] or 'Unassigned'}")
+
+
+def ask_filter(label, allowed):
+    """Return a valid optional filter; blank means all."""
+    while True:
+        value = input(f'{label} ({"/".join(allowed)}; blank=all): ').strip()
+        if not value or value.casefold() in {item.casefold() for item in allowed}:
+            return value
+        print(f'Invalid {label.lower()}. Please try again.')
+
+
+def show_search_results(tickets):
+    if not tickets:
+        print('No tickets found.')
+    for ticket in tickets:
+        print(f"{ticket['id']} | {ticket['title']} | {ticket['category']} | "
+              f"{ticket['priority']} | {ticket['status']} | "
+              f"{ticket['assigned_to'] or 'Unassigned'}")
+
+
+def show_report(tickets):
+    summary = report(tickets)
+    print(f"Total tickets: {summary['total']}")
+    for group in ('status', 'priority', 'category'):
+        print(f'{group.capitalize()}:')
+        for name, count in summary[group].items():
+            print(f'  {name}: {count}')
+    print(f"Unresolved: {summary['unresolved']}")
+    print(f"Resolved: {summary['resolved']}")
+    print(f"Resolution percentage: {summary['resolution_percentage']:.2f}%")
+
+
+def add_note_cli(tickets, path):
+    """Use Engineer A's note API; save only after successful validation."""
+    from campusflow.notes import add_note
+    candidate = deepcopy(tickets)
+    ticket_id = input('Ticket ID: ')
+    author = input('Author: ')
+    message = input('Note message: ')
+    note = add_note(candidate, ticket_id, author, message)
+    save_tickets(candidate, path)
+    print(f"Saved note {note['id']} for {ticket_id}.")
+    return candidate
+
+
+def view_notes_cli(tickets):
+    ticket = get_ticket(tickets, input('Ticket ID: '))
+    notes = ticket.get('notes', [])
+    if not notes:
+        print('No notes for this ticket.')
+    for note in sorted(notes, key=lambda item: int(item['id'][1:])):
+        print(f"{note['id']} | {note['author']} | {note['message']}")
 
 
 def run(path):
@@ -38,7 +96,7 @@ def run(path):
     while True:
         try:
             print(MENU)
-            choice = input('Choose 1–8: ').strip()
+            choice = input('Choose 1–12: ').strip()
             if choice == '8':
                 print('Goodbye!')
                 return 0
@@ -68,14 +126,23 @@ def run(path):
             elif choice == '6':
                 show(work_queue(tickets))
             elif choice == '7':
-                summary = report(tickets)
-                print(f"Total tickets: {summary['total']}")
-                for group in ('status', 'priority'):
-                    print(f'{group.capitalize()}:')
-                    for name, count in summary[group].items():
-                        print(f'  {name}: {count}')
+                show_report(tickets)
+            elif choice == '9':
+                title = input('Title contains (blank=all): ')
+                category = ask_filter('Category', CATEGORIES)
+                status = ask_filter('Status', STATUSES)
+                priority = ask_filter('Priority', PRIORITIES)
+                show_search_results(search_tickets(
+                    tickets, title=title, category=category,
+                    status=status, priority=priority))
+            elif choice == '10':
+                run_understanding_check()
+            elif choice == '11':
+                tickets = add_note_cli(tickets, path)
+            elif choice == '12':
+                view_notes_cli(tickets)
             else:
-                print('Please choose a number from 1 to 8.')
+                print('Please choose a number from 1 to 12.')
         except (ValueError, OSError) as error:
             print(f'Error: {error}')
         except (EOFError, KeyboardInterrupt):
