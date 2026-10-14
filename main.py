@@ -20,11 +20,11 @@ CampusFlow
 5. Change status / reopen
 6. Work queue
 7. Reports
-8. Search tickets
-9. Engineering Understanding Check
-10. Add follow-up note
-11. View ticket notes
-12. Exit'''
+8. Exit
+9. Search tickets
+10. Engineering Understanding Check
+11. Add follow-up note
+12. View ticket notes'''
 
 
 def show(tickets):
@@ -97,7 +97,7 @@ def run(path):
         try:
             print(MENU)
             choice = input('Choose 1–12: ').strip()
-            if choice == '12':
+            if choice == '8':
                 print('Goodbye!')
                 return 0
             if choice in ('1', '4', '5'):
@@ -127,7 +127,7 @@ def run(path):
                 show(work_queue(tickets))
             elif choice == '7':
                 show_report(tickets)
-            elif choice == '8':
+            elif choice == '9':
                 title = input('Title contains (blank=all): ')
                 category = ask_filter('Category', CATEGORIES)
                 status = ask_filter('Status', STATUSES)
@@ -135,11 +135,11 @@ def run(path):
                 show_search_results(search_tickets(
                     tickets, title=title, category=category,
                     status=status, priority=priority))
-            elif choice == '9':
-                run_understanding_check()
             elif choice == '10':
-                tickets = add_note_cli(tickets, path)
+                run_understanding_check()
             elif choice == '11':
+                tickets = add_note_cli(tickets, path)
+            elif choice == '12':
                 view_notes_cli(tickets)
             else:
                 print('Please choose a number from 1 to 12.')
