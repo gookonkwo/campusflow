@@ -29,8 +29,12 @@ def score_answers(answers, questions=QUESTIONS):
     return sum(answer.upper() == question[2] for answer, question in zip(answers, questions))
 
 
-def run_understanding_check(input_fn=input, output_fn=print):
+def run_understanding_check(input_fn=None, output_fn=None):
     """Ask six questions; retry invalid choices; collect two explanations."""
+    if input_fn is None:
+        input_fn = input
+    if output_fn is None:
+        output_fn = print
     answers = []
     for number, (scenario, options, _) in enumerate(QUESTIONS, 1):
         output_fn(f"Q{number}. {scenario}")
