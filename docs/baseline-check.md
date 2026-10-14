@@ -10,10 +10,10 @@
 - GitHub Actions config: `.github/workflows/tests.yml`, Python 3.9, runs the above unittest command on push and pull request.
 - Baseline GitHub Actions run: https://github.com/gookonkwo/campusflow/actions/runs/38586451753
 - Verified result: **PASS**. The workflow finished successfully, including the Python unittest step.
-- Exact test count, complete verbose output, and a separate fresh-clone run: **not captured here**. They must not be represented as verified.
+- Baseline GitHub Actions job log: **Ran 27 tests in 0.019s**, followed by **OK** (Python 3.9). The full verbose output is available in the linked Actions run. A separate fresh-clone local run has not been performed.
 
-## Three required manual input checks — pending reproduction
-The following are proposed reproducible inputs and expected results, not observed manual test outcomes.
+## Three required manual input checks — interactive verification pending
+The following are proposed reproducible inputs and expected results, not observed interactive manual test outcomes. Equivalent scripted CLI scenarios have been added in `tests/test_cli_scenarios_a.py` and passed in the Engineer A CI run linked below. Those automated results must not be represented as interactive manual execution.
 
 1. **Priority precedence**: Create ticket title "Wi-Fi outage", category Network, urgency high, affected users 10. Expected calculated priority: critical.
 2. **Unassigned ticket protection**: Create an open ticket without an assignee; attempt to change status to in_progress. Expected: action rejected; original ticket collection remains unchanged.
@@ -47,7 +47,7 @@ Existing checks for unassigned status transitions, nonpositive affected-users, a
 
 ## Remaining evidence required
 - Execute and record the three baseline CLI input scenarios.
-- Record full unittest count/output from a fresh clone or downloadable CI log.
+- Baseline CI log count captured: 27 tests passed; Engineer A latest CI log count captured: 47 tests passed. A separate fresh-clone local run remains outstanding.
 - Document specific reproduced failures, if any, with evidence.
 
 ## Feature-branch verification — 2026-10-14
@@ -56,3 +56,11 @@ Existing checks for unassigned status transitions, nonpositive affected-users, a
 - The Python 3.9 workflow log explicitly reports **Ran 43 tests in 0.022s**, followed by **OK**.
 - This is verified CI evidence for Engineer A's branch only; it does **not** establish that Engineer B's changes or the combined branches pass.
 - The three baseline manual CLI scenarios above are still pending actual execution and must not be marked complete.
+
+## Latest Engineer A review-resolution verification — 2026-10-14
+- Engineer A head: `1f2798ae4858dc3496361d87555f78ea07354e04`.
+- GitHub Actions run: https://github.com/gookonkwo/campusflow/actions/runs/38593520822 — **PASS**.
+- The Python 3.9 job log reports **Ran 47 tests in 0.033s**, followed by **OK**.
+- New regression coverage checks malformed existing note IDs and preservation of unchanged state on rejection.
+- The three CLI scenarios in `tests/test_cli_scenarios_a.py` ran as part of this automated suite. **Interactive manual CLI execution remains pending**; do not conflate these with observed manual results.
+- Engineer B's review observation about malformed existing note IDs was addressed in commits `6ccb486` and `1f2798a`.
