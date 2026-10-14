@@ -33,7 +33,10 @@ def create_ticket(tickets, title, category, urgency, affected_users):
 
 
 def get_ticket(tickets, ticket_id):
+    if not isinstance(ticket_id, str) or not ticket_id.strip():
+        raise ValueError('Ticket ID must be a nonblank string')
+    normalized_id = ticket_id.strip().upper()
     for ticket in tickets:
-        if ticket['id'] == ticket_id.strip().upper():
+        if ticket['id'] == normalized_id:
             return ticket
     raise ValueError('Unknown ticket ID')
