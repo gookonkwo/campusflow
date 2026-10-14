@@ -92,5 +92,5 @@ class WorkflowEdgeTests(unittest.TestCase):
             'category': {'Network': 3, 'Hardware': 0, 'Software': 0, 'Other': 0},
             'unresolved': 2,
             'resolved': 1,
-            'resolution_percentage': 100 / 3,
+            'resolution_percentage': 33.33,
         })
