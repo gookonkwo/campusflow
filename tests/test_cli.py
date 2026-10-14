@@ -32,7 +32,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(load_tickets(self.path)[1]['id'], 'T002')
 
     def test_invalid_input_then_recovery(self):
-        output = self.play(['9', '1', 'Wi-Fi', 'Network', 'high', 'bad',
+        output = self.play(['99', '1', 'Wi-Fi', 'Network', 'high', 'bad',
                             '1', 'Wi-Fi', 'Network', 'high', '12',
                             '5', 'T001', 'resolved', '8'])
         self.assertIn('Error:', output)
