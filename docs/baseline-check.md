@@ -49,3 +49,10 @@ Existing checks for unassigned status transitions, nonpositive affected-users, a
 - Execute and record the three baseline CLI input scenarios.
 - Record full unittest count/output from a fresh clone or downloadable CI log.
 - Document specific reproduced failures, if any, with evidence.
+
+## Feature-branch verification — 2026-10-14
+- Engineer A head: `2efeb5402010252c4ec824617a95ce0d667ffa41`.
+- GitHub Actions PR run: https://github.com/gookonkwo/campusflow/actions/runs/38591267615 — **PASS**.
+- The Python 3.9 workflow log explicitly reports **Ran 43 tests in 0.022s**, followed by **OK**.
+- This is verified CI evidence for Engineer A's branch only; it does **not** establish that Engineer B's changes or the combined branches pass.
+- The three baseline manual CLI scenarios above are still pending actual execution and must not be marked complete.
