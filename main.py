@@ -22,7 +22,9 @@ CampusFlow
 7. Reports
 8. Search tickets
 9. Engineering Understanding Check
-10. Exit'''
+10. Add follow-up note
+11. View ticket notes
+12. Exit'''
 
 
 def show(tickets):
@@ -63,6 +65,28 @@ def show_report(tickets):
     print(f"Resolution percentage: {summary['resolution_percentage']:.2f}%")
 
 
+def add_note_cli(tickets, path):
+    """Use Engineer A's note API; save only after successful validation."""
+    from campusflow.notes import add_note
+    candidate = deepcopy(tickets)
+    ticket_id = input('Ticket ID: ')
+    author = input('Author: ')
+    message = input('Note message: ')
+    note = add_note(candidate, ticket_id, author, message)
+    save_tickets(candidate, path)
+    print(f"Saved note {note['note_id']} for {ticket_id}.")
+    return candidate
+
+
+def view_notes_cli(tickets):
+    ticket = get_ticket(tickets, input('Ticket ID: '))
+    notes = ticket.get('notes', [])
+    if not notes:
+        print('No notes for this ticket.')
+    for note in sorted(notes, key=lambda item: int(item['note_id'][1:])):
+        print(f"{note['note_id']} | {note['author']} | {note['message']}")
+
+
 def run(path):
     try:
         tickets = load_tickets(path)
@@ -72,8 +96,8 @@ def run(path):
     while True:
         try:
             print(MENU)
-            choice = input('Choose 1–10: ').strip()
-            if choice == '10':
+            choice = input('Choose 1–12: ').strip()
+            if choice == '12':
                 print('Goodbye!')
                 return 0
             if choice in ('1', '4', '5'):
@@ -113,8 +137,12 @@ def run(path):
                     status=status, priority=priority))
             elif choice == '9':
                 run_understanding_check()
+            elif choice == '10':
+                tickets = add_note_cli(tickets, path)
+            elif choice == '11':
+                view_notes_cli(tickets)
             else:
-                print('Please choose a number from 1 to 10.')
+                print('Please choose a number from 1 to 12.')
         except (ValueError, OSError) as error:
             print(f'Error: {error}')
         except (EOFError, KeyboardInterrupt):
