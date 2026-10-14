@@ -47,6 +47,23 @@ class NoteTests(unittest.TestCase):
             add_note(self.tickets, self.ticket["id"], "Ada", "Late update")
         self.assertEqual(self.tickets, before)
 
+    def test_malformed_existing_note_ids_do_not_mutate(self):
+        malformed = (
+            [{"author": "Ada", "message": "Missing ID"}],
+            [{"id": None, "author": "Ada", "message": "Invalid ID"}],
+            [{"id": "broken", "author": "Ada", "message": "Invalid ID"}],
+            [{"id": "N000", "author": "Ada", "message": "Zero ID"}],
+            [{"id": "N001", "author": "Ada", "message": "First"},
+             {"id": "N001", "author": "Bob", "message": "Duplicate"}],
+        )
+        for notes in malformed:
+            with self.subTest(notes=notes):
+                self.ticket["notes"] = copy.deepcopy(notes)
+                before = copy.deepcopy(self.tickets)
+                with self.assertRaises(ValueError):
+                    add_note(self.tickets, self.ticket["id"], "Bob", "Update")
+                self.assertEqual(self.tickets, before)
+
     def test_note_ids_continue_after_existing_saved_notes(self):
         self.ticket["notes"] = [{"id": "N004", "author": "Ada", "message": "Previous"}]
         note = add_note(self.tickets, self.ticket["id"], "Bob", "New")
