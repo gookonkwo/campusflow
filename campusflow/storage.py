@@ -42,6 +42,23 @@ def validate(tickets):
             raise ValueError('Invalid saved staff name')
         if ticket['status'] != 'open' and staff is None:
             raise ValueError('Started tickets must have assigned staff')
+        notes = ticket.get('notes', [])
+        if not isinstance(notes, list):
+            raise ValueError('Saved notes must be a list')
+        note_numbers = set()
+        for note in notes:
+            if not isinstance(note, dict) or not {'id', 'author', 'message'}.issubset(note):
+                raise ValueError('Invalid saved note structure')
+            note_id = note['id']
+            if not isinstance(note_id, str) or not re.fullmatch(r'N[0-9]{3,}', note_id):
+                raise ValueError('Invalid saved note ID')
+            note_number = int(note_id[1:])
+            if note_number < 1 or note_number in note_numbers:
+                raise ValueError('Duplicate or invalid saved note ID')
+            note_numbers.add(note_number)
+            for field in ('author', 'message'):
+                if not isinstance(note[field], str) or not note[field].strip():
+                    raise ValueError('Invalid saved note ' + field)
     return tickets
 
 
