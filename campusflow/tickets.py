@@ -27,7 +27,7 @@ def create_ticket(tickets, title, category, urgency, affected_users):
               'category': CATEGORIES[category.strip().lower()],
               'urgency': urgency, 'affected_users': affected_users,
               'priority': priority_for(urgency, affected_users),
-              'status': 'open', 'assigned_to': None}
+              'status': 'open', 'assigned_to': None, 'notes': []}
     tickets.append(ticket)
     return ticket
 
