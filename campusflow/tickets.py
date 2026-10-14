@@ -27,13 +27,16 @@ def create_ticket(tickets, title, category, urgency, affected_users):
               'category': CATEGORIES[category.strip().lower()],
               'urgency': urgency, 'affected_users': affected_users,
               'priority': priority_for(urgency, affected_users),
-              'status': 'open', 'assigned_to': None}
+              'status': 'open', 'assigned_to': None, 'notes': []}
     tickets.append(ticket)
     return ticket
 
 
 def get_ticket(tickets, ticket_id):
+    if not isinstance(ticket_id, str) or not ticket_id.strip():
+        raise ValueError('Ticket ID must be a nonblank string')
+    normalized_id = ticket_id.strip().upper()
     for ticket in tickets:
-        if ticket['id'] == ticket_id.strip().upper():
+        if ticket['id'] == normalized_id:
             return ticket
     raise ValueError('Unknown ticket ID')
