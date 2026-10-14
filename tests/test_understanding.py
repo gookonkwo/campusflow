@@ -1,6 +1,7 @@
 """Tests for the understanding check's scoring and input retry."""
 
 import unittest
+from unittest.mock import patch
 
 from campusflow.understanding_check import score_answers, run_understanding_check
 
@@ -17,6 +18,12 @@ class UnderstandingCheckTests(unittest.TestCase):
             score_answers(["B", "C"])
         with self.assertRaises(ValueError):
             score_answers(["B", "C", "B", "C", "C", "X"])
+
+    def test_default_input_uses_current_mock_at_call_time(self):
+        values = ["B", "C", "B", "C", "C", "B", "First explanation", "Second explanation"]
+        with patch("builtins.input", side_effect=values):
+            result = run_understanding_check(output_fn=lambda message: None)
+        self.assertEqual(result["score"], 6)
 
     def test_invalid_choice_retries_without_extra_score(self):
         inputs = iter(["X", "", "B", "C", "B", "C", "C", "B",
