@@ -14,7 +14,21 @@ def add_note(tickets, ticket_id, author, message):
         raise ValueError("Note message cannot be blank")
 
     existing = ticket.get("notes", [])
-    number = max((int(note["id"][1:]) for note in existing), default=0) + 1
+    if not isinstance(existing, list):
+        raise ValueError("Ticket notes must be a list")
+    seen = set()
+    numbers = []
+    for prior in existing:
+        if not isinstance(prior, dict):
+            raise ValueError("Existing note must be an object")
+        ident = prior.get("id")
+        if (not isinstance(ident, str) or len(ident) < 2
+                or not ident.startswith("N") or not ident[1:].isdigit()
+                or int(ident[1:]) < 1 or ident in seen):
+            raise ValueError("Existing note has an invalid or duplicate ID")
+        seen.add(ident)
+        numbers.append(int(ident[1:]))
+    number = max(numbers, default=0) + 1
     note = {"id": f"N{number:03d}", "author": author.strip(),
             "message": message.strip()}
     if "notes" not in ticket:
