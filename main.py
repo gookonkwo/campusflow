@@ -74,7 +74,7 @@ def add_note_cli(tickets, path):
     message = input('Note message: ')
     note = add_note(candidate, ticket_id, author, message)
     save_tickets(candidate, path)
-    print(f"Saved note {note['note_id']} for {ticket_id}.")
+    print(f"Saved note {note['id']} for {ticket_id}.")
     return candidate
 
 
@@ -83,8 +83,8 @@ def view_notes_cli(tickets):
     notes = ticket.get('notes', [])
     if not notes:
         print('No notes for this ticket.')
-    for note in sorted(notes, key=lambda item: int(item['note_id'][1:])):
-        print(f"{note['note_id']} | {note['author']} | {note['message']}")
+    for note in sorted(notes, key=lambda item: int(item['id'][1:])):
+        print(f"{note['id']} | {note['author']} | {note['message']}")
 
 
 def run(path):
