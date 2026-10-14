@@ -136,7 +136,7 @@ def run(path):
                     tickets, title=title, category=category,
                     status=status, priority=priority))
             elif choice == '10':
-                run_understanding_check()
+                run_understanding_check(input_fn=input, output_fn=print)
             elif choice == '11':
                 tickets = add_note_cli(tickets, path)
             elif choice == '12':
