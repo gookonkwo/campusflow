@@ -30,6 +30,16 @@ class SearchTests(unittest.TestCase):
     def test_empty_filters_return_all_in_original_order(self):
         self.assertEqual(search_tickets(self.tickets), self.tickets)
 
+    def test_search_results_are_independent_deep_copies(self):
+        from copy import deepcopy
+        self.tickets[0]["notes"] = [{"id": "N001", "message": "Before"}]
+        before = deepcopy(self.tickets)
+        results = search_tickets(self.tickets, category="Network")
+        self.assertIsNot(results[0], self.tickets[0])
+        results[0]["title"] = "Changed outside storage"
+        results[0]["notes"][0]["message"] = "Changed nested note"
+        self.assertEqual(self.tickets, before)
+
     def test_invalid_filter_raises_without_changing_tickets(self):
         from copy import deepcopy
         before = deepcopy(self.tickets)
